@@ -21,8 +21,14 @@
                     FPT<span class="text-primary">Job</span>Match
                 </a>
 
+<<<<<<< HEAD
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#mainNavbar" aria-controls="mainNavbar"
+                        aria-expanded="false" aria-label="Toggle navigation">
+=======
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
                         aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+>>>>>>> 8e9c4430fd1b35a356932943293ae4595894d249
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
@@ -31,6 +37,39 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
+<<<<<<< HEAD
+
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Jobs" asp-action="Index">Jobs</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Jobs" asp-action="Create">Post a Job</a>
+                            </li>
+
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="adminDropdown"
+                                       role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Admin
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Admin" asp-action="Users">
+                                                Manage users
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Admin" asp-action="Jobs">
+                                                Manage jobs
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+=======
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Jobs" asp-action="Index">Jobs</a>
                         </li>
@@ -64,6 +103,7 @@
                                     </li>
                                 </ul>
                             </li>
+>>>>>>> 8e9c4430fd1b35a356932943293ae4595894d249
                         }
                     </ul>
 
@@ -76,10 +116,15 @@
                                 </span>
                             </li>
                             <li class="nav-item">
+<<<<<<< HEAD
+                                <form class="d-inline" asp-area="Identity" asp-page="/Account/Logout"
+                                      asp-route-returnUrl="@Url.Action("Index", "Home")" method="post">
+=======
                                 <form class="d-inline" asp-area="Identity"
                                       asp-page="/Account/Logout"
                                       asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })"
                                       method="post">
+>>>>>>> 8e9c4430fd1b35a356932943293ae4595894d249
                                     <button type="submit" class="btn btn-outline-light btn-sm">
                                         Log out
                                     </button>

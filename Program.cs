@@ -11,20 +11,31 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
+<<<<<<< HEAD
+    options.SignIn.RequireConfirmedAccount = false;
+    options.User.RequireUniqueEmail = true;
+=======
     
     options.SignIn.RequireConfirmedAccount = false;
+>>>>>>> 8e9c4430fd1b35a356932943293ae4595894d249
 })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders()
     .AddDefaultUI();
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> 8e9c4430fd1b35a356932943293ae4595894d249
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
+<<<<<<< HEAD
+    await SeedDataAsync(scope.ServiceProvider);
+=======
     var services = scope.ServiceProvider;
 
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
@@ -74,6 +85,7 @@ using (var scope = app.Services.CreateScope())
                        .GetResult();
         }
     }
+>>>>>>> 8e9c4430fd1b35a356932943293ae4595894d249
 }
 
 if (!app.Environment.IsDevelopment())
@@ -90,7 +102,10 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> 8e9c4430fd1b35a356932943293ae4595894d249
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
@@ -98,3 +113,44 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.Run();
+<<<<<<< HEAD
+
+static async Task SeedDataAsync(IServiceProvider services)
+{
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+
+    var roles = new[] { "Admin", "Employer", "JobSeeker" };
+
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+
+    const string adminEmail = "admin@fptjobmatch.com";
+    const string adminPassword = "Admin@123";
+
+    var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
+    if (adminUser == null)
+    {
+        adminUser = new ApplicationUser
+        {
+            UserName = adminEmail,
+            Email = adminEmail,
+            EmailConfirmed = true
+        };
+
+        var result = await userManager.CreateAsync(adminUser, adminPassword);
+
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(adminUser, "Admin");
+        }
+    }
+}
+=======
+>>>>>>> 8e9c4430fd1b35a356932943293ae4595894d249

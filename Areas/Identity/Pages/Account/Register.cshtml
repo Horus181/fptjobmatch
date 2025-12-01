@@ -1,0 +1,63 @@
+﻿@page
+@model WebApplication2.Areas.Identity.Pages.Account.RegisterModel
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Register";
+}
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="card shadow-sm border-0 w-100" style="max-width: 420px;">
+        <div class="card-body p-4">
+            <h2 class="mb-3 text-center">Create your account</h2>
+            <p class="text-muted text-center mb-4">
+                Sign up with your email and choose how you want to use FPTJobMatch.
+            </p>
+
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Input.Email" class="form-label"></label>
+                    <input asp-for="Input.Email" class="form-control" autocomplete="email"
+                           placeholder="you@example.com" />
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Input.Password" class="form-label"></label>
+                    <input asp-for="Input.Password" class="form-control" autocomplete="new-password" />
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Input.ConfirmPassword" class="form-label"></label>
+                    <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" />
+                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Input.SelectedRole" class="form-label">Register as</label>
+                    <select asp-for="Input.SelectedRole" class="form-select">
+                        <option value="">-- Select role --</option>
+                        <option value="JobSeeker">Job seeker</option>
+                        <option value="Employer">Employer</option>
+                    </select>
+                    <span asp-validation-for="Input.SelectedRole" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 mb-3">
+                    Register
+                </button>
+
+                <div class="text-center">
+                    <span class="text-muted">Already have an account?</span>
+                    <a asp-page="./Login">Sign in</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

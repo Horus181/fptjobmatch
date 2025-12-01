@@ -39,7 +39,12 @@ namespace WebApplication2.Controllers
                 {
                     Id = u.Id,
                     Email = u.Email ?? "",
+<<<<<<< HEAD
+                    Roles = string.Join(", ", roles),
+                    EmailConfirmed = u.EmailConfirmed
+=======
                     Roles = string.Join(", ", roles)
+>>>>>>> 8e9c4430fd1b35a356932943293ae4595894d249
                 });
             }
 
@@ -150,7 +155,24 @@ namespace WebApplication2.Controllers
             return RedirectToAction(nameof(Users));
         }
 
+<<<<<<< HEAD
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
+
+            user.EmailConfirmed = true;
+            await _userManager.UpdateAsync(user);
+
+            return RedirectToAction("Users");
+        }
+
+
+=======
      
+>>>>>>> 8e9c4430fd1b35a356932943293ae4595894d249
 
         public async Task<IActionResult> Jobs()
         {
@@ -178,6 +200,11 @@ namespace WebApplication2.Controllers
         public string Id { get; set; } = "";
         public string Email { get; set; } = "";
         public string Roles { get; set; } = "";
+<<<<<<< HEAD
+
+        public bool EmailConfirmed { get; set; }
+=======
+>>>>>>> 8e9c4430fd1b35a356932943293ae4595894d249
     }
 
     public class RoleSelection

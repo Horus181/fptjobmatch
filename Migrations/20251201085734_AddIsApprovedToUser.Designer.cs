@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApplication2.Data;
 
@@ -11,9 +12,11 @@ using WebApplication2.Data;
 namespace WebApplication2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251201085734_AddIsApprovedToUser")]
+    partial class AddIsApprovedToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -174,12 +177,9 @@ namespace WebApplication2.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-<<<<<<< HEAD
                     b.Property<bool>("IsApproved")
                         .HasColumnType("bit");
 
-=======
->>>>>>> 8e9c4430fd1b35a356932943293ae4595894d249
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -226,7 +226,6 @@ namespace WebApplication2.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("WebApplication2.Models.Job", b =>
                 {
                     b.Property<int>("Id")
@@ -307,8 +306,6 @@ namespace WebApplication2.Migrations
                     b.ToTable("JobApplications");
                 });
 
-=======
->>>>>>> 8e9c4430fd1b35a356932943293ae4595894d249
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -359,7 +356,6 @@ namespace WebApplication2.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
-<<<<<<< HEAD
 
             modelBuilder.Entity("WebApplication2.Models.JobApplication", b =>
                 {
@@ -371,8 +367,6 @@ namespace WebApplication2.Migrations
 
                     b.Navigation("Job");
                 });
-=======
->>>>>>> 8e9c4430fd1b35a356932943293ae4595894d249
 #pragma warning restore 612, 618
         }
     }
