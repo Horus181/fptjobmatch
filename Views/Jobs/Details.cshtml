@@ -1,0 +1,37 @@
+﻿@model WebApplication2.Models.Job
+
+@{
+    ViewData["Title"] = "Job details";
+}
+
+<div class="container mt-4">
+    <h2>Job details</h2>
+
+    <div class="card shadow-sm border-0 mt-3">
+        <div class="card-body">
+            <h3 class="card-title">@Model.Title</h3>
+            <h5 class="card-subtitle mb-2 text-muted">@Model.EmployerName</h5>
+
+            <p class="mb-1"><strong>Location:</strong> @Model.Location</p>
+            <p class="mb-1"><strong>Category:</strong> @Model.Category</p>
+            <p class="mb-1"><strong>Deadline:</strong> @Model.Deadline.ToShortDateString()</p>
+
+            <hr />
+
+            <h5>Qualifications</h5>
+            <p>@Model.Qualifications</p>
+
+            <h5>Job description</h5>
+            <p>@Model.Description</p>
+
+            <div class="mt-3">
+                <a asp-action="Apply" asp-route-id="@Model.Id" class="btn btn-primary me-2">
+                    Apply for this job
+                </a>
+                <a asp-action="Index" class="btn btn-secondary">
+                    Back to job list
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

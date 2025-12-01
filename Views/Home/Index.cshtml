@@ -1,0 +1,36 @@
+﻿@{
+    ViewData["Title"] = "FPTJobMatch - Home";
+}
+
+<div class="container mt-5">
+    <div class="row align-items-center">
+        <div class="col-md-6 mb-4">
+            <h1 class="display-4 fw-bold">Find the right job. Hire the right talent.</h1>
+            <p class="lead">
+                FPTJobMatch is a simple and modern platform that connects employers and job seekers quickly and effectively.
+            </p>
+            <p>
+                Browse the latest job opportunities, apply in a few clicks, or post a new vacancy for your company.
+            </p>
+            <a asp-controller="Jobs" asp-action="Index" class="btn btn-primary btn-lg me-2">
+                Browse Jobs
+            </a>
+            <a asp-controller="Jobs" asp-action="Create" class="btn btn-outline-secondary btn-lg">
+                Post a Job
+            </a>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title">Why FPTJobMatch?</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Fast and easy job posting</li>
+                        <li class="list-group-item">Smart filtering for relevant candidates</li>
+                        <li class="list-group-item">Instant notifications for applications</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

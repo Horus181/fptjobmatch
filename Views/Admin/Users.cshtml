@@ -1,0 +1,38 @@
+﻿@model IEnumerable<WebApplication2.Controllers.AdminUserViewModel>
+@{
+    ViewData["Title"] = "User management";
+}
+
+<div class="container mt-4">
+    <h2>User management</h2>
+    <a asp-action="CreateUser" class="btn btn-success mb-3">Create new account</a>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>Roles</th>
+                <th style="width: 200px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var u in Model)
+            {
+                <tr>
+                    <td>@u.Email</td>
+                    <td>@u.Roles</td>
+                    <td>
+                        <a asp-action="EditUserRoles" asp-route-id="@u.Id"
+                           class="btn btn-sm btn-primary me-1">Edit roles</a>
+
+                        <form asp-action="DeleteUser" asp-route-id="@u.Id" method="post"
+                              class="d-inline"
+                              onsubmit="return confirm('Are you sure you want to delete this user?');">
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

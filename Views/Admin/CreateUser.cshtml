@@ -1,0 +1,41 @@
+﻿@model WebApplication2.Controllers.CreateUserViewModel
+
+@{
+    ViewData["Title"] = "Create new user";
+}
+
+<div class="container mt-4">
+    <h2>Create new user</h2>
+
+    <form asp-action="CreateUser" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Password" class="form-label"></label>
+            <input asp-for="Password" class="form-control" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="SelectedRole" class="form-label">Role</label>
+            <select asp-for="SelectedRole" class="form-select"
+                    asp-items="@(new SelectList(Model.AvailableRoles))">
+                <option value="">-- Select role --</option>
+            </select>
+            <span asp-validation-for="SelectedRole" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create</button>
+        <a asp-action="Users" class="btn btn-secondary ms-2">Cancel</a>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
