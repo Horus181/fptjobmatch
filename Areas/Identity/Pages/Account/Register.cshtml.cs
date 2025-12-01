@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using WebApplication2.Models;
 
 namespace WebApplication2.Areas.Identity.Pages.Account
@@ -27,31 +28,45 @@ namespace WebApplication2.Areas.Identity.Pages.Account
         [BindProperty]
         public InputModel Input { get; set; } = new();
 
+        public string? ReturnUrl { get; set; }
+
+        public List<SelectListItem> RoleOptions { get; } = new()
+        {
+            new SelectListItem { Text = "Job seeker", Value = "JobSeeker" },
+            new SelectListItem { Text = "Employer",  Value = "Employer" }
+        };
+
         public class InputModel
         {
             [Required]
             [EmailAddress]
+            [Display(Name = "Email")]
             public string Email { get; set; } = string.Empty;
 
             [Required]
             [DataType(DataType.Password)]
+            [Display(Name = "Password")]
             public string Password { get; set; } = string.Empty;
 
             [DataType(DataType.Password)]
-            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+            [Display(Name = "Confirm password")]
+            [Compare("Password",
+                ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; } = string.Empty;
 
             [Required(ErrorMessage = "Please select a role.")]
+            [Display(Name = "Register as")]
             public string SelectedRole { get; set; } = string.Empty;
         }
 
-        public void OnGet()
+        public void OnGet(string? returnUrl = null)
         {
+            ReturnUrl = returnUrl ?? Url.Content("~/");
         }
 
         public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
+            ReturnUrl = returnUrl ?? Url.Content("~/");
 
             if (!ModelState.IsValid)
             {
@@ -61,38 +76,33 @@ namespace WebApplication2.Areas.Identity.Pages.Account
             var user = new ApplicationUser
             {
                 UserName = Input.Email,
-                Email = Input.Email
+                Email = Input.Email,
+                EmailConfirmed = false
             };
 
-            var createResult = await _userManager.CreateAsync(user, Input.Password);
+            var result = await _userManager.CreateAsync(user, Input.Password);
 
-            if (!createResult.Succeeded)
+            if (!result.Succeeded)
             {
-                foreach (var error in createResult.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-                return Page();
-            }
-
-            var roleResult = await _userManager.AddToRoleAsync(user, Input.SelectedRole);
-
-            if (!roleResult.Succeeded)
-            {
-                foreach (var error in roleResult.Errors)
+                foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
 
-                await _userManager.DeleteAsync(user);
                 return Page();
             }
 
-            _logger.LogInformation("New user created.");
+            if (Input.SelectedRole == "Employer" || Input.SelectedRole == "JobSeeker")
+            {
+                await _userManager.AddToRoleAsync(user, Input.SelectedRole);
+            }
 
-            await _signInManager.SignInAsync(user, isPersistent: false);
+            _logger.LogInformation("New user created and waiting for admin approval.");
 
-            return LocalRedirect(returnUrl);
+            TempData["RegistrationMessage"] =
+                "Your account has been created and is waiting for admin approval.";
+
+            return RedirectToPage("Login");
         }
     }
 }

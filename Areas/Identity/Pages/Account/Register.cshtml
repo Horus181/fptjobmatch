@@ -1,25 +1,26 @@
 ﻿@page
 @model WebApplication2.Areas.Identity.Pages.Account.RegisterModel
 @{
-    Layout = "/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Register";
 }
 
-<div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
-    <div class="card shadow-sm border-0 w-100" style="max-width: 420px;">
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card shadow-sm" style="width: 420px;">
         <div class="card-body p-4">
-            <h2 class="mb-3 text-center">Create your account</h2>
+            <h2 class="text-center mb-3">Create your account</h2>
             <p class="text-muted text-center mb-4">
-                Sign up with your email and choose how you want to use FPTJobMatch.
+                Sign up with your email and choose how you want<br />
+                to use FPTJobMatch.
             </p>
 
-            <form method="post">
-                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <form id="registerForm"
+                  method="post"
+                  asp-route-returnUrl="@Model.ReturnUrl">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                 <div class="mb-3">
                     <label asp-for="Input.Email" class="form-label"></label>
-                    <input asp-for="Input.Email" class="form-control" autocomplete="email"
-                           placeholder="you@example.com" />
+                    <input asp-for="Input.Email" class="form-control" autocomplete="username" />
                     <span asp-validation-for="Input.Email" class="text-danger"></span>
                 </div>
 
@@ -37,23 +38,23 @@
 
                 <div class="mb-3">
                     <label asp-for="Input.SelectedRole" class="form-label">Register as</label>
-                    <select asp-for="Input.SelectedRole" class="form-select">
+                    <select asp-for="Input.SelectedRole"
+                            class="form-select"
+                            asp-items="Model.RoleOptions">
                         <option value="">-- Select role --</option>
-                        <option value="JobSeeker">Job seeker</option>
-                        <option value="Employer">Employer</option>
                     </select>
                     <span asp-validation-for="Input.SelectedRole" class="text-danger"></span>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100 mb-3">
+                <button type="submit" class="btn btn-primary w-100">
                     Register
                 </button>
-
-                <div class="text-center">
-                    <span class="text-muted">Already have an account?</span>
-                    <a asp-page="./Login">Sign in</a>
-                </div>
             </form>
+
+            <div class="text-center mt-3">
+                <span>Already have an account? </span>
+                <a asp-area="Identity" asp-page="/Account/Login">Sign in</a>
+            </div>
         </div>
     </div>
 </div>
