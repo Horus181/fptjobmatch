@@ -6,10 +6,9 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace WebApplication2.Controllers
 {
-<<<<<<< HEAD
+
     [Authorize(Roles = "JobSeeker,Employer,Admin")]
-=======
->>>>>>> 8e9c4430fd1b35a356932943293ae4595894d249
+
     public class JobsController : Controller
     {
         
