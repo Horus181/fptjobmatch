@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace WebApplication2.Models
@@ -30,5 +31,11 @@ namespace WebApplication2.Models
 
         [DataType(DataType.Date)]
         public DateTime Deadline { get; set; }
+
+        // Navigation: 1 Job – N JobApplications (nếu bạn dùng)
+        public ICollection<JobApplication> Applications { get; set; } = new List<JobApplication>();
+
+        public bool IsApproved { get; set; } = false;
+
     }
 }

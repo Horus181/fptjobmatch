@@ -1,0 +1,45 @@
+﻿@using WebApplication2.Models
+@model WebApplication2.Models.AdminJobApplicationsViewModel
+
+
+@{
+    ViewData["Title"] = "Job applications";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-3">Applications for: @Model.JobTitle</h2>
+
+    <a asp-action="Jobs" class="btn btn-outline-secondary mb-3">
+        ← Back to jobs
+    </a>
+
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Applicant name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Cover letter</th>
+                <th>Applied at</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var a in Model.Applications)
+            {
+                <tr>
+                    <td>@a.ApplicantName</td>
+                    <td>@a.ApplicantEmail</td>
+                    <td>@a.Introduction</td>
+                    <td>@a.AppliedAt.ToString("g")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (!Model.Applications.Any())
+    {
+        <div class="alert alert-info mt-3">
+            No one has applied for this job yet.
+        </div>
+    }
+</div>

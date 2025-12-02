@@ -1,0 +1,75 @@
+﻿@model IEnumerable<WebApplication2.Models.Job>
+
+@{
+    ViewData["Title"] = "Job management";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-3">Job management</h2>
+
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Employer</th>
+                <th>Location</th>
+                <th>Deadline</th>
+                <th>Status</th>
+                <th style="width: 220px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var j in Model)
+            {
+                <tr>
+                    <td>@j.Title</td>
+                    <td>@j.EmployerName</td>
+                    <td>@j.Location</td>
+                    <td>@j.Deadline.ToShortDateString()</td>
+                    <td>
+                        @if (j.IsApproved)
+                        {
+                            <span class="badge bg-success">Approved</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark">Pending</span>
+                        }
+                    </td>
+                    <td>
+                        @if (!j.IsApproved)
+                        {
+                            <form asp-action="ApproveJob"
+                                  asp-route-id="@j.Id"
+                                  method="post"
+                                  class="d-inline">
+                                <button type="submit"
+                                        class="btn btn-sm btn-success me-1">
+                                    Approve
+                                </button>
+                            </form>
+                        }
+
+                        <form asp-action="DeleteJob"
+                              asp-route-id="@j.Id"
+                              method="post"
+                              class="d-inline"
+                              onsubmit="return confirm('Delete this job?');">
+                            <button type="submit"
+                                    class="btn btn-sm btn-danger">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info mt-3">
+            There are currently no job postings.
+        </div>
+    }
+</div>
