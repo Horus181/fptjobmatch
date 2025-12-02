@@ -1,0 +1,34 @@
+﻿@model WebApplication2.Controllers.EditUserRolesViewModel
+
+@{
+    ViewData["Title"] = "Edit roles";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-3">Edit roles for @Model.Email</h2>
+
+    <form asp-action="EditUserRoles" method="post">
+        <input type="hidden" asp-for="UserId" />
+
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input class="form-control" value="@Model.Email" disabled />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Roles</label>
+
+            @for (int i = 0; i < Model.Roles.Count; i++)
+            {
+                <div class="form-check">
+                    <input class="form-check-input" asp-for="Roles[i].Selected" />
+                    <input type="hidden" asp-for="Roles[i].RoleName" />
+                    <label class="form-check-label">@Model.Roles[i].RoleName</label>
+                </div>
+            }
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a asp-action="Users" class="btn btn-secondary ms-2">Cancel</a>
+    </form>
+</div>

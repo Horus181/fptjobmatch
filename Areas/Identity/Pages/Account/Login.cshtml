@@ -1,0 +1,67 @@
+﻿@page
+@model WebApplication2.Areas.Identity.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Sign in";
+}
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card shadow-sm" style="width: 420px;">
+        <div class="card-body p-4">
+            <h2 class="text-center mb-3">Sign in to FPTJobMatch</h2>
+            <p class="text-muted text-center mb-4">
+                Enter your account details to continue.
+            </p>
+
+            @if (TempData["RegistrationMessage"] is string regMsg)
+            {
+                <div class="alert alert-success" role="alert">
+                    @regMsg
+                </div>
+            }
+
+            @if (ViewData.ModelState.ErrorCount > 0)
+            {
+                <div class="alert alert-danger" role="alert">
+                    @foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <div>@err.ErrorMessage</div>
+                    }
+                </div>
+            }
+
+            <form id="loginForm"
+                  method="post"
+                  asp-route-returnUrl="@Model.ReturnUrl">
+                <div class="mb-3">
+                    <label asp-for="Input.Email" class="form-label"></label>
+                    <input asp-for="Input.Email" class="form-control" autocomplete="username" />
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Input.Password" class="form-label"></label>
+                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" />
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input asp-for="Input.RememberMe" class="form-check-input" />
+                    <label asp-for="Input.RememberMe" class="form-check-label"></label>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">
+                    Sign in
+                </button>
+            </form>
+
+            <div class="text-center mt-3">
+                <span>Don't have an account?</span>
+                <a asp-area="Identity" asp-page="/Account/Register">Register</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
