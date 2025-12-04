@@ -1,4 +1,4 @@
-﻿@model WebApplication2.Controllers.EditUserRolesViewModel
+﻿@model WebApplication2.Models.EditUserRolesViewModel
 
 @{
     ViewData["Title"] = "Edit user roles";
@@ -16,7 +16,7 @@
                 <div class="form-check">
                     <input class="form-check-input"
                            asp-for="Roles[i].Selected" />
-                    <label class="form-check-label">
+                    <label class="form-check-label" asp-for="Roles[i].Selected">
                         @Model.Roles[i].RoleName
                     </label>
                     <input type="hidden" asp-for="Roles[i].RoleName" />

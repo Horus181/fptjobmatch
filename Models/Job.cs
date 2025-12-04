@@ -32,10 +32,11 @@ namespace WebApplication2.Models
         [DataType(DataType.Date)]
         public DateTime Deadline { get; set; }
 
-        // Navigation: 1 Job – N JobApplications (nếu bạn dùng)
-        public ICollection<JobApplication> Applications { get; set; } = new List<JobApplication>();
-
+        // Job được duyệt hay chưa
         public bool IsApproved { get; set; } = false;
 
+        // Danh sách các application cho job này
+        public ICollection<JobApplication> Applications { get; set; }
+            = new List<JobApplication>();
     }
 }

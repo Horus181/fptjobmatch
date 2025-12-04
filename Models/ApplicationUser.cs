@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.Collections.Generic;
 
 namespace WebApplication2.Models
 {
     public class ApplicationUser : IdentityUser
     {
+        // Các property bổ sung nếu bạn có...
 
-        public bool IsApproved { get; set; } = false;
-
-       
-
+        // Danh sách application mà user đã nộp (nếu là JobSeeker)
+        public ICollection<JobApplication> JobApplications { get; set; }
+            = new List<JobApplication>();
     }
 }

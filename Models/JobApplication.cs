@@ -1,27 +1,33 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using WebApplication2.Models;
 
-namespace WebApplication2.Models
+public class JobApplication
 {
-    public class JobApplication
-    {
-        public int Id { get; set; }
+    public int Id { get; set; }
 
-        [Required]
-        public int JobId { get; set; }
-        public Job? Job { get; set; }
+    [Required]
+    public int JobId { get; set; }
+    public Job? Job { get; set; }
 
-        [Required]
-        [StringLength(150)]
-        public string ApplicantName { get; set; } = string.Empty;
+    [Required]
+    public string JobSeekerId { get; set; } = string.Empty;
+    public ApplicationUser? JobSeeker { get; set; }
 
-        [Required]
-        [EmailAddress]
-        public string ApplicantEmail { get; set; } = string.Empty;
+    [Required]
+    [StringLength(150)]
+    public string ApplicantName { get; set; } = string.Empty;
 
-        [StringLength(1000)]
-        public string? Introduction { get; set; }
+    [Required]
+    [EmailAddress]
+    public string ApplicantEmail { get; set; } = string.Empty;
 
-        public DateTime AppliedAt { get; set; } = DateTime.Now;
-    }
+    [StringLength(2000)]
+    public string Introduction { get; set; } = string.Empty;
+
+    // ĐỔI TÊN PROPERTY Ở ĐÂY
+    public DateTime AppliedAt { get; set; } = DateTime.UtcNow;
+
+    public ApplicationStatus Status { get; set; } = ApplicationStatus.Pending;
+
+    public string? CvFilePath { get; set; }
 }

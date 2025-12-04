@@ -1,4 +1,5 @@
-﻿@model IEnumerable<WebApplication2.Models.JobApplication>
+﻿@using WebApplication2.Models
+@model IEnumerable<JobApplication>
 
 @{
     ViewData["Title"] = "Job applications";
@@ -7,7 +8,7 @@
 <div class="container mt-4">
     <h2>Job applications</h2>
 
-    @if (!Model.Any())
+    @if (Model == null || !Model.Any())
     {
         <div class="alert alert-info mt-3">
             There are currently no applications for this job.
@@ -31,17 +32,18 @@
                         <td>@app.ApplicantName</td>
                         <td>@app.ApplicantEmail</td>
                         <td>
-                            @(
-                                                string.IsNullOrWhiteSpace(app.Introduction)
-                                                ? "-"
-                                                : (app.Introduction!.Length > 80
-                                                ? app.Introduction.Substring(0, 80) + "..."
-                                                : app.Introduction)
-                                                )
-                    </td>
-                    <td>@app.AppliedAt</td>
-                </tr>
-                        }
+                            @{
+                                var intro = string.IsNullOrWhiteSpace(app.Introduction)
+                                ? "-"
+                                : (app.Introduction!.Length > 80
+                                ? app.Introduction.Substring(0, 80) + "..."
+                                : app.Introduction);
+                            }
+                            @intro
+                        </td>
+                        <td>@app.AppliedAt</td>
+                    </tr>
+                }
             </tbody>
         </table>
     }

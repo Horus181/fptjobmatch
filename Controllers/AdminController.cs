@@ -24,15 +24,168 @@ namespace WebApplication2.Controllers
             _context = context;
         }
 
-        // ... phần Users giữ nguyên ...
+        // ============ USER MANAGEMENT ============
 
+        [HttpGet]
+        public async Task<IActionResult> Users()
+        {
+            var users = await _userManager.Users.ToListAsync();
+            var model = new List<AdminUserViewModel>();
+
+            foreach (var u in users)
+            {
+                var roles = await _userManager.GetRolesAsync(u);
+
+                model.Add(new AdminUserViewModel
+                {
+                    Id = u.Id,
+                    Email = u.Email ?? string.Empty,
+                    Roles = string.Join(", ", roles),
+                    EmailConfirmed = u.EmailConfirmed
+                });
+            }
+
+            return View(model); // Views/Admin/Users.cshtml
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
+
+            await _userManager.DeleteAsync(user);
+            return RedirectToAction(nameof(Users));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditUserRoles(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
+
+            var allRoles = await _roleManager.Roles.ToListAsync();
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            var model = new EditUserRolesViewModel
+            {
+                UserId = user.Id,
+                Email = user.Email ?? string.Empty,
+                Roles = allRoles.Select(r => new RoleSelection
+                {
+                    RoleName = r.Name ?? string.Empty,
+                    Selected = userRoles.Contains(r.Name ?? string.Empty)
+                }).ToList()
+            };
+
+            return View(model); // Views/Admin/EditUserRoles.cshtml
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditUserRoles(EditUserRolesViewModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null) return NotFound();
+
+            var currentRoles = await _userManager.GetRolesAsync(user);
+            await _userManager.RemoveFromRolesAsync(user, currentRoles);
+
+            var selectedRoles = model.Roles
+                .Where(r => r.Selected)
+                .Select(r => r.RoleName)
+                .ToList();
+
+            if (selectedRoles.Any())
+            {
+                await _userManager.AddToRolesAsync(user, selectedRoles);
+            }
+
+            return RedirectToAction(nameof(Users));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CreateUser()
+        {
+            var allRoles = await _roleManager.Roles
+                .Select(r => r.Name!)
+                .ToListAsync();
+
+            var model = new CreateUserViewModel
+            {
+                AvailableRoles = allRoles
+            };
+
+            return View(model); // Views/Admin/CreateUser.cshtml
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateUser(CreateUserViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                model.AvailableRoles = await _roleManager.Roles
+                    .Select(r => r.Name!)
+                    .ToListAsync();
+                return View(model);
+            }
+
+            var user = new ApplicationUser
+            {
+                UserName = model.Email,
+                Email = model.Email,
+                EmailConfirmed = true
+            };
+
+            var result = await _userManager.CreateAsync(user, model.Password);
+
+            if (!result.Succeeded)
+            {
+                foreach (var err in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, err.Description);
+                }
+
+                model.AvailableRoles = await _roleManager.Roles
+                    .Select(r => r.Name!)
+                    .ToListAsync();
+
+                return View(model);
+            }
+
+            if (!string.IsNullOrEmpty(model.SelectedRole))
+            {
+                await _userManager.AddToRoleAsync(user, model.SelectedRole);
+            }
+
+            return RedirectToAction(nameof(Users));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
+
+            user.EmailConfirmed = true;
+            await _userManager.UpdateAsync(user);
+
+            return RedirectToAction(nameof(Users));
+        }
+
+        // ============ JOB MANAGEMENT ============
+
+        [HttpGet]
         public async Task<IActionResult> Jobs()
         {
             var jobs = await _context.Jobs
                 .OrderByDescending(j => j.Deadline)
                 .ToListAsync();
 
-            return View(jobs);
+            return View(jobs); // Views/Admin/Jobs.cshtml
         }
 
         [HttpPost]
