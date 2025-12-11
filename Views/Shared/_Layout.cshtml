@@ -1,7 +1,27 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using WebApplication2.Models
+@using WebApplication2.Data
+@using System.Security.Claims
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
+@inject ApplicationDbContext DbContext
+
+@{
+    int newAppsCount = 0;
+
+    if (SignInManager.IsSignedIn(User) && User.IsInRole("Employer"))
+    {
+        var employerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (!string.IsNullOrEmpty(employerId))
+        {
+            newAppsCount = DbContext.JobApplications
+                .Count(a => a.Job != null
+                            && a.Job.EmployerId == employerId
+                            && !a.IsViewedByEmployer);
+        }
+    }
+}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -33,7 +53,6 @@
                             <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
 
-                        @* Chỉ hiển thị menu Jobs nếu đã đăng nhập *@
                         @if (SignInManager.IsSignedIn(User))
                         {
                             <li class="nav-item">
@@ -43,8 +62,20 @@
                                 <a class="nav-link" asp-controller="Jobs" asp-action="Create">Post a Job</a>
                             </li>
 
-                            @* Menu Admin *@
-                            if (User.IsInRole("Admin"))
+                            @if (User.IsInRole("Employer"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Jobs" asp-action="MyApplications">
+                                        Applications
+                                        @if (newAppsCount > 0)
+                                        {
+                                            <span class="badge bg-danger ms-1">@newAppsCount</span>
+                                        }
+                                    </a>
+                                </li>
+                            }
+
+                            @if (User.IsInRole("Admin"))
                             {
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="adminDropdown"

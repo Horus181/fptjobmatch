@@ -1,20 +1,39 @@
-﻿@model WebApplication2.Models.Job
+﻿@using Microsoft.AspNetCore.Identity
+@using WebApplication2.Models
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+
+@model WebApplication2.Models.Job
 
 @{
     ViewData["Title"] = "Job details";
+    var currentUser = UserManager.GetUserAsync(User).Result;
+    bool isJobSeeker = User.IsInRole("JobSeeker");
 }
 
 <div class="container mt-4">
+
     <h2>Job details</h2>
+
+    @if (TempData["AppliedMessage"] is string msg)
+    {
+        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+            @msg
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
 
     <div class="card shadow-sm border-0 mt-3">
         <div class="card-body">
-            <h3 class="card-title">@Model.Title</h3>
-            <h5 class="card-subtitle mb-2 text-muted">@Model.EmployerName</h5>
 
-            <p class="mb-1"><strong>Location:</strong> @Model.Location</p>
-            <p class="mb-1"><strong>Category:</strong> @Model.Category</p>
-            <p class="mb-1"><strong>Deadline:</strong> @Model.Deadline.ToShortDateString()</p>
+            <h3 class="card-title">@Model.Title</h3>
+            <h5 class="card-subtitle mb-2 text-muted">
+                Posted by: @Model.EmployerName
+            </h5>
+
+            <p><strong>Location:</strong> @Model.Location</p>
+            <p><strong>Category:</strong> @Model.Category</p>
+            <p><strong>Deadline:</strong> @Model.Deadline.ToShortDateString()</p>
 
             <hr />
 
@@ -24,10 +43,18 @@
             <h5>Job description</h5>
             <p>@Model.Description</p>
 
-            <div class="mt-3">
-                <a asp-action="Apply" asp-route-id="@Model.Id" class="btn btn-primary me-2">
-                    Apply for this job
-                </a>
+            <div class="mt-4 d-flex gap-2">
+
+                @* Chỉ JobSeeker mới thấy nút Apply *@
+                @if (isJobSeeker)
+                {
+                    <a asp-action="Apply"
+                       asp-route-id="@Model.Id"
+                       class="btn btn-primary">
+                        Apply for this job
+                    </a>
+                }
+
                 <a asp-action="Index" class="btn btn-secondary">
                     Back to job list
                 </a>

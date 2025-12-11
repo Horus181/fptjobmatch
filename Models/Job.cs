@@ -38,5 +38,8 @@ namespace WebApplication2.Models
         // Danh sách các application cho job này
         public ICollection<JobApplication> Applications { get; set; }
             = new List<JobApplication>();
+
+        public string? EmployerId { get; set; }
+        public ApplicationUser? Employer { get; set; }
     }
 }

@@ -24,7 +24,6 @@ namespace WebApplication2.Controllers
             _context = context;
         }
 
-        // ============ USER MANAGEMENT ============
 
         [HttpGet]
         public async Task<IActionResult> Users()
@@ -45,7 +44,7 @@ namespace WebApplication2.Controllers
                 });
             }
 
-            return View(model); // Views/Admin/Users.cshtml
+            return View(model);
         }
 
         [HttpPost]
@@ -79,7 +78,7 @@ namespace WebApplication2.Controllers
                 }).ToList()
             };
 
-            return View(model); // Views/Admin/EditUserRoles.cshtml
+            return View(model);
         }
 
         [HttpPost]
@@ -117,7 +116,7 @@ namespace WebApplication2.Controllers
                 AvailableRoles = allRoles
             };
 
-            return View(model); // Views/Admin/CreateUser.cshtml
+            return View(model); 
         }
 
         [HttpPost]
@@ -176,7 +175,7 @@ namespace WebApplication2.Controllers
             return RedirectToAction(nameof(Users));
         }
 
-        // ============ JOB MANAGEMENT ============
+       
 
         [HttpGet]
         public async Task<IActionResult> Jobs()
@@ -185,7 +184,7 @@ namespace WebApplication2.Controllers
                 .OrderByDescending(j => j.Deadline)
                 .ToListAsync();
 
-            return View(jobs); // Views/Admin/Jobs.cshtml
+            return View(jobs); 
         }
 
         [HttpPost]

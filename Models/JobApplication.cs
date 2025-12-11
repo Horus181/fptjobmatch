@@ -5,6 +5,7 @@ namespace WebApplication2.Models
 {
     public class JobApplication
     {
+   
         public int Id { get; set; }
 
         public int JobId { get; set; }
@@ -28,5 +29,7 @@ namespace WebApplication2.Models
         public DateTime AppliedAt { get; set; } = DateTime.UtcNow;
 
         public ApplicationStatus Status { get; set; } = ApplicationStatus.Pending;
+
+        public bool IsViewedByEmployer { get; set; } = false;
     }
 }

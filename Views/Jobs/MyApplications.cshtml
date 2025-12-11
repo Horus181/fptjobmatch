@@ -1,0 +1,52 @@
+﻿@model IEnumerable<WebApplication2.Models.JobApplication>
+
+@{
+    ViewData["Title"] = "My Applications";
+}
+
+<div class="container mt-4">
+    <h2>Applications for your jobs</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info mt-3">
+            There are currently no applications for your jobs.
+        </div>
+    }
+    else
+    {
+        <table class="table table-striped mt-3">
+            <thead>
+                <tr>
+                    <th>Job title</th>
+                    <th>Applicant</th>
+                    <th>Email</th>
+                    <th>Introduction</th>
+                    <th>Applied at</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var app in Model)
+                {
+                    <tr>
+                        <td>@app.Job.Title</td>
+                        <td>@app.ApplicantName</td>
+                        <td>@app.ApplicantEmail</td>
+                        <td>
+                            @(
+                                                string.IsNullOrWhiteSpace(app.Introduction)
+                                                ? "-"
+                                                : (app.Introduction!.Length > 80
+                                                ? app.Introduction.Substring(0, 80) + "..."
+                                                : app.Introduction)
+                                                )
+                    </td>
+                    <td>@app.AppliedAt.ToLocalTime()</td>
+                    <td>@app.Status</td>
+                </tr>
+                        }
+            </tbody>
+        </table>
+    }
+</div>
