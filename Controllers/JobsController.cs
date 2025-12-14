@@ -20,12 +20,16 @@ namespace WebApplication2.Controllers
             _userManager = userManager;
         }
 
-        // ===================== JOB LIST + DETAILS =====================
-
         public async Task<IActionResult> Index(string? searchString)
         {
-            var query = _context.Jobs
-                .Where(j => j.IsApproved);
+            var query = _context.Jobs.AsQueryable();
+
+            query = query.Where(j => j.IsApproved);
+
+            if (User.IsInRole("JobSeeker"))
+            {
+                query = query.Where(j => !j.IsClosed);
+            }
 
             if (!string.IsNullOrWhiteSpace(searchString))
             {
@@ -57,9 +61,7 @@ namespace WebApplication2.Controllers
             return View(job);
         }
 
-        // ===================== EMPLOYER TẠO JOB =====================
-
-        [Authorize(Roles = "Employer,Admin")]
+        [Authorize(Roles = "Employer")]
         public IActionResult Create()
         {
             return View();
@@ -67,7 +69,7 @@ namespace WebApplication2.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Employer,Admin")]
+        [Authorize(Roles = "Employer")]
         public async Task<IActionResult> Create(Job job)
         {
             if (!ModelState.IsValid)
@@ -78,7 +80,9 @@ namespace WebApplication2.Controllers
 
             job.EmployerId = currentUser.Id;
             job.EmployerName = currentUser.Email ?? currentUser.UserName ?? string.Empty;
-            job.IsApproved = false; // phải đợi Admin duyệt
+            job.IsApproved = false;
+            job.IsClosed = false;
+            job.ClosedAt = null;
 
             _context.Jobs.Add(job);
             await _context.SaveChangesAsync();
@@ -89,13 +93,11 @@ namespace WebApplication2.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ===================== JOBSEEKER APPLY JOB =====================
-
         [Authorize(Roles = "JobSeeker")]
         public async Task<IActionResult> Apply(int id)
         {
             var job = await _context.Jobs
-                .FirstOrDefaultAsync(j => j.Id == id && j.IsApproved);
+                .FirstOrDefaultAsync(j => j.Id == id && j.IsApproved && !j.IsClosed);
 
             if (job == null) return NotFound();
 
@@ -116,9 +118,8 @@ namespace WebApplication2.Controllers
         [Authorize(Roles = "JobSeeker")]
         public async Task<IActionResult> Apply(JobApplication application)
         {
-            // Lấy job (chỉ cho apply nếu job đã được duyệt)
             var job = await _context.Jobs
-                .FirstOrDefaultAsync(j => j.Id == application.JobId && j.IsApproved);
+                .FirstOrDefaultAsync(j => j.Id == application.JobId && j.IsApproved && !j.IsClosed);
 
             if (job == null) return NotFound();
 
@@ -128,7 +129,6 @@ namespace WebApplication2.Controllers
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null) return Challenge();
 
-            // Tạo record mới – không set Id thủ công
             var newApplication = new JobApplication
             {
                 JobId = job.Id,
@@ -144,14 +144,9 @@ namespace WebApplication2.Controllers
             _context.JobApplications.Add(newApplication);
             await _context.SaveChangesAsync();
 
-            // Thông báo cho JobSeeker – đọc ở trang Details
             TempData["SuccessMessage"] = "Your application has been submitted successfully.";
-
-            // >>> Quan trọng: quay về trang Details, không về Index <<<
             return RedirectToAction(nameof(Details), new { id = job.Id });
         }
-
-        // ===================== JOBSEEKER: DANH SÁCH JOB ĐÃ APPLY =====================
 
         [Authorize(Roles = "JobSeeker")]
         public async Task<IActionResult> MyApplications()
@@ -168,9 +163,7 @@ namespace WebApplication2.Controllers
             return View(apps);
         }
 
-        // ===================== EMPLOYER: XEM CÁC CV APPLY VÀO JOB CỦA MÌNH =====================
-
-        [Authorize(Roles = "Employer,Admin")]
+        [Authorize(Roles = "Employer")]
         public async Task<IActionResult> ApplicationsForMyJobs()
         {
             var employerId = _userManager.GetUserId(User);
@@ -179,12 +172,11 @@ namespace WebApplication2.Controllers
             var apps = await _context.JobApplications
                 .Include(a => a.Job)
                 .Where(a => a.Job != null && a.Job.EmployerId == employerId)
-                .OrderBy(a => a.Status)            // Pending lên trước
-                .ThenBy(a => a.IsViewedByEmployer) // chưa xem lên trước
+                .OrderBy(a => a.Status)
+                .ThenBy(a => a.IsViewedByEmployer)
                 .ThenByDescending(a => a.AppliedAt)
                 .ToListAsync();
 
-            // Lần đầu vào, đánh dấu là đã xem (để không còn "new")
             var unseen = apps.Where(a => !a.IsViewedByEmployer).ToList();
             if (unseen.Any())
             {
@@ -197,11 +189,9 @@ namespace WebApplication2.Controllers
             return View(apps);
         }
 
-        // ===== EMPLOYER: APPROVE / REJECT 1 APPLICATION =====
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Employer,Admin")]
+        [Authorize(Roles = "Employer")]
         public async Task<IActionResult> ApproveApplication(int id)
         {
             var employerId = _userManager.GetUserId(User);
@@ -213,7 +203,7 @@ namespace WebApplication2.Controllers
 
             if (application == null) return NotFound();
             if (application.Job == null || application.Job.EmployerId != employerId)
-                return Forbid(); // không được duyệt job của người khác
+                return Forbid();
 
             application.Status = ApplicationStatus.Approved;
             await _context.SaveChangesAsync();
@@ -224,7 +214,7 @@ namespace WebApplication2.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Employer,Admin")]
+        [Authorize(Roles = "Employer")]
         public async Task<IActionResult> RejectApplication(int id)
         {
             var employerId = _userManager.GetUserId(User);
@@ -243,6 +233,65 @@ namespace WebApplication2.Controllers
 
             TempData["EmployerMessage"] = "Application has been rejected.";
             return RedirectToAction(nameof(ApplicationsForMyJobs));
+        }
+
+        [Authorize(Roles = "Employer")]
+        public async Task<IActionResult> ApplicationDetails(int id)
+        {
+            var employerId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(employerId)) return Challenge();
+
+            var application = await _context.JobApplications
+                .Include(a => a.Job)
+                .FirstOrDefaultAsync(a => a.Id == id);
+
+            if (application == null) return NotFound();
+            if (application.Job == null || application.Job.EmployerId != employerId)
+                return Forbid();
+
+            return View(application);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Employer")]
+        public async Task<IActionResult> CloseJob(int id)
+        {
+            var employerId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(employerId)) return Challenge();
+
+            var job = await _context.Jobs.FirstOrDefaultAsync(j => j.Id == id);
+            if (job == null) return NotFound();
+            if (job.EmployerId != employerId) return Forbid();
+
+            job.IsClosed = true;
+            job.ClosedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            TempData["EmployerMessage"] = "Job has been closed.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Employer")]
+        public async Task<IActionResult> ReopenJob(int id)
+        {
+            var employerId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(employerId)) return Challenge();
+
+            var job = await _context.Jobs.FirstOrDefaultAsync(j => j.Id == id);
+            if (job == null) return NotFound();
+            if (job.EmployerId != employerId) return Forbid();
+
+            job.IsClosed = false;
+            job.ClosedAt = null;
+
+            await _context.SaveChangesAsync();
+
+            TempData["EmployerMessage"] = "Job has been reopened.";
+            return RedirectToAction(nameof(Details), new { id });
         }
     }
 }

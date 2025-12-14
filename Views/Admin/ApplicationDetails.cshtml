@@ -1,0 +1,79 @@
+﻿@model WebApplication2.Models.JobApplication
+@using WebApplication2.Models
+
+@{
+    ViewData["Title"] = "Application details";
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2 class="mb-0">Application details</h2>
+            <div class="text-muted">Review candidate submission</div>
+        </div>
+
+        <a asp-controller="Admin" asp-action="Applications" class="btn btn-outline-secondary">
+            ← Back to Applications
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="text-muted small">Applicant name</div>
+                    <div class="fw-semibold">@Model.ApplicantName</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="text-muted small">Applicant email</div>
+                    <div class="fw-semibold">@Model.ApplicantEmail</div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="text-muted small">Job</div>
+                    <div class="fw-semibold">@Model.Job?.Title</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="text-muted small">Employer</div>
+                    <div class="fw-semibold">@Model.Job?.EmployerName</div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <div class="text-muted small">Applied at</div>
+                <div class="fw-semibold">
+                    @Model.AppliedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <div class="text-muted small mb-1">Application status</div>
+                @switch (Model.Status)
+                {
+                    case ApplicationStatus.Pending:
+                        <span class="badge bg-warning text-dark">Pending</span>
+                        break;
+                    case ApplicationStatus.Approved:
+                        <span class="badge bg-success">Accepted</span>
+                        break;
+                    case ApplicationStatus.Rejected:
+                        <span class="badge bg-danger">Rejected</span>
+                        break;
+                }
+            </div>
+
+            <hr />
+
+            <h5 class="mb-2">Candidate introduction / CV</h5>
+
+            <div class="border rounded p-3 bg-light" style="white-space: pre-wrap;">
+                @Model.Introduction
+            </div>
+
+        </div>
+    </div>
+</div>

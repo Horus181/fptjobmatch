@@ -8,7 +8,7 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="mb-0">Job Listings</h2>
         <a asp-action="Create" class="btn btn-success">
-            ➕ Post New Job
+            <i class="bi bi-plus-circle me-1"></i> Post New Job
         </a>
     </div>
 
@@ -18,7 +18,9 @@
                    placeholder="Search by job title or location..." />
         </div>
         <div class="col-md-2">
-            <button type="submit" class="btn btn-primary w-100">Search</button>
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-search me-1"></i> Search
+            </button>
         </div>
     </form>
 
@@ -36,17 +38,28 @@
                 <div class="col-md-4 mb-4">
                     <div class="card h-100 shadow-sm border-0">
                         <div class="card-body d-flex flex-column">
+
                             <h5 class="card-title">@job.Title</h5>
                             <h6 class="card-subtitle mb-2 text-muted">@job.EmployerName</h6>
-                            <p class="mb-1">
-                                📍 @job.Location
-                            </p>
-                            <p class="mb-1">
-                                🏷️ @job.Category
-                            </p>
-                            <p class="small text-muted mb-2">
-                                Deadline: @job.Deadline.ToShortDateString()
-                            </p>
+
+                            <!-- Location -->
+                            <div class="d-flex align-items-center gap-2 text-muted mb-1">
+                                <i class="bi bi-geo-alt-fill text-danger"></i>
+                                <span>@job.Location</span>
+                            </div>
+
+                            <!-- Category -->
+                            <div class="d-flex align-items-center gap-2 text-muted mb-1">
+                                <i class="bi bi-briefcase-fill text-warning"></i>
+                                <span>@job.Category</span>
+                            </div>
+
+                            <!-- Deadline -->
+                            <div class="d-flex align-items-center gap-2 text-muted small mb-2">
+                                <i class="bi bi-calendar-event"></i>
+                                <span>Deadline: @job.Deadline.ToShortDateString()</span>
+                            </div>
+
                             <p class="card-text flex-grow-1">
                                 @((job.Description?.Length ?? 0) > 120
                                                         ? job.Description.Substring(0, 120) + "..."
@@ -63,6 +76,7 @@
                                     Apply now
                                 </a>
                             </div>
+
                         </div>
                     </div>
                 </div>

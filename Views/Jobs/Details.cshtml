@@ -7,57 +7,182 @@
 
 @{
     ViewData["Title"] = "Job details";
-    var currentUser = UserManager.GetUserAsync(User).Result;
+
     bool isJobSeeker = User.IsInRole("JobSeeker");
+    bool isEmployer = User.IsInRole("Employer");
+    bool isAdmin = User.IsInRole("Admin");
+
+    var currentUserId = UserManager.GetUserId(User);
+    bool isOwnerEmployer = isEmployer && !string.IsNullOrEmpty(currentUserId) && Model.EmployerId == currentUserId;
 }
 
 <div class="container mt-4">
 
-    <h2>Job details</h2>
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <div>
+            <h2 class="mb-0">Job details</h2>
+            <div class="text-muted">Review the job information and take action.</div>
+        </div>
 
-    @if (TempData["AppliedMessage"] is string msg)
+        @if (isAdmin)
+        {
+            <a asp-controller="Admin" asp-action="Jobs" class="btn btn-outline-secondary">
+                ← Back to Manage Jobs
+            </a>
+        }
+        else
+        {
+            <a asp-controller="Jobs" asp-action="Index" class="btn btn-outline-secondary">
+                ← Back to job list
+            </a>
+        }
+    </div>
+
+    @if (TempData["SuccessMessage"] is string msg)
     {
         <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
-            @msg
+            <strong>Success!</strong> @msg
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["EmployerMessage"] is string emsg)
+    {
+        <div class="alert alert-info alert-dismissible fade show mt-3" role="alert">
+            @emsg
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
 
     <div class="card shadow-sm border-0 mt-3">
-        <div class="card-body">
+        <div class="card-body p-4">
 
-            <h3 class="card-title">@Model.Title</h3>
-            <h5 class="card-subtitle mb-2 text-muted">
-                Posted by: @Model.EmployerName
-            </h5>
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+                <div>
+                    <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                        <h3 class="card-title mb-0">@Model.Title</h3>
 
-            <p><strong>Location:</strong> @Model.Location</p>
-            <p><strong>Category:</strong> @Model.Category</p>
-            <p><strong>Deadline:</strong> @Model.Deadline.ToShortDateString()</p>
+                        @if (Model.IsClosed)
+                        {
+                            <span class="badge bg-secondary">Closed</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">Open</span>
+                        }
+                    </div>
 
-            <hr />
+                    <div class="text-muted">
+                        Posted by: <span class="fw-semibold">@Model.EmployerName</span>
+                    </div>
 
-            <h5>Qualifications</h5>
-            <p>@Model.Qualifications</p>
+                    @if (Model.IsClosed && Model.ClosedAt.HasValue)
+                    {
+                        <div class="small text-muted mt-1">
+                            Closed at: @Model.ClosedAt.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                        </div>
+                    }
+                </div>
 
-            <h5>Job description</h5>
-            <p>@Model.Description</p>
+                <div class="text-end">
+                    <div class="small text-muted">Deadline</div>
+                    <div class="fw-semibold">@Model.Deadline.ToShortDateString()</div>
+                </div>
+            </div>
 
-            <div class="mt-4 d-flex gap-2">
+            <hr class="my-3" />
 
-                @* Chỉ JobSeeker mới thấy nút Apply *@
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="small text-muted">Location</div>
+                    <div class="fw-semibold">@Model.Location</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="small text-muted">Category</div>
+                    <div class="fw-semibold">@Model.Category</div>
+                </div>
+            </div>
+
+            <hr class="my-3" />
+
+            <h5 class="mb-2">Qualifications</h5>
+            <p class="mb-4" style="white-space: pre-wrap;">@Model.Qualifications</p>
+
+            <h5 class="mb-2">Job description</h5>
+            <p class="mb-0" style="white-space: pre-wrap;">@Model.Description</p>
+
+            <hr class="my-4" />
+
+            <div class="d-flex flex-wrap gap-2">
+
                 @if (isJobSeeker)
                 {
-                    <a asp-action="Apply"
-                       asp-route-id="@Model.Id"
-                       class="btn btn-primary">
-                        Apply for this job
+                    if (!Model.IsClosed)
+                    {
+                        <a asp-controller="Jobs"
+                           asp-action="Apply"
+                           asp-route-id="@Model.Id"
+                           class="btn btn-primary">
+                            Apply for this job
+                        </a>
+                    }
+                    else
+                    {
+                        <button class="btn btn-secondary" disabled>
+                            Job is closed
+                        </button>
+                    }
+
+                    <a asp-controller="Jobs"
+                       asp-action="MyApplications"
+                       class="btn btn-outline-primary">
+                        My applications
                     </a>
                 }
 
-                <a asp-action="Index" class="btn btn-secondary">
-                    Back to job list
+                @if (isOwnerEmployer)
+                {
+                    <a asp-controller="Jobs"
+                       asp-action="ApplicationsForMyJobs"
+                       class="btn btn-outline-primary">
+                        View candidates
+                    </a>
+
+                    @if (!Model.IsClosed)
+                    {
+                        <form asp-controller="Jobs" asp-action="CloseJob" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit" class="btn btn-outline-danger">
+                                Close job
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form asp-controller="Jobs" asp-action="ReopenJob" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit" class="btn btn-outline-success">
+                                Reopen job
+                            </button>
+                        </form>
+                    }
+                }
+
+                @if (isAdmin)
+                {
+                    <a asp-controller="Admin"
+                       asp-action="Jobs"
+                       class="btn btn-outline-primary">
+                        Back to Manage Jobs
+                    </a>
+                }
+
+                <a asp-controller="Jobs" asp-action="Index" class="btn btn-secondary">
+                    Browse other jobs
                 </a>
+
             </div>
         </div>
     </div>

@@ -18,14 +18,12 @@ namespace WebApplication2.Data
         {
             base.OnModelCreating(builder);
 
-            // 1 Job – nhiều JobApplication
             builder.Entity<JobApplication>()
                 .HasOne(ja => ja.Job)
                 .WithMany(j => j.Applications)
                 .HasForeignKey(ja => ja.JobId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // 1 JobSeeker (ApplicationUser) – nhiều JobApplication
             builder.Entity<JobApplication>()
                 .HasOne(ja => ja.JobSeeker)
                 .WithMany(u => u.JobApplications)

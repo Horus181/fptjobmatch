@@ -24,7 +24,6 @@ namespace WebApplication2.Controllers
             _context = context;
         }
 
-
         [HttpGet]
         public async Task<IActionResult> Users()
         {
@@ -116,7 +115,7 @@ namespace WebApplication2.Controllers
                 AvailableRoles = allRoles
             };
 
-            return View(model); 
+            return View(model);
         }
 
         [HttpPost]
@@ -175,16 +174,37 @@ namespace WebApplication2.Controllers
             return RedirectToAction(nameof(Users));
         }
 
-       
-
         [HttpGet]
-        public async Task<IActionResult> Jobs()
+        public async Task<IActionResult> Jobs(string? q, bool onlyPending = false)
         {
-            var jobs = await _context.Jobs
+            q = q?.Trim();
+
+            var jobsQuery = _context.Jobs.AsQueryable();
+
+            if (onlyPending)
+                jobsQuery = jobsQuery.Where(j => !j.IsApproved);
+
+            if (!string.IsNullOrEmpty(q))
+            {
+              
+                var employerIds = await _userManager.Users
+                    .Where(u =>
+                        (u.Email != null && u.Email.Contains(q)) ||
+                        (u.UserName != null && u.UserName.Contains(q)))
+                    .Select(u => u.Id)
+                    .ToListAsync();
+
+                jobsQuery = jobsQuery.Where(j => employerIds.Contains(j.EmployerId));
+            }
+
+            var jobs = await jobsQuery
                 .OrderByDescending(j => j.Deadline)
                 .ToListAsync();
 
-            return View(jobs); 
+            ViewBag.Q = q;
+            ViewBag.OnlyPending = onlyPending;
+
+            return View(jobs);
         }
 
         [HttpPost]
@@ -212,5 +232,64 @@ namespace WebApplication2.Controllers
 
             return RedirectToAction(nameof(Jobs));
         }
+
+      
+        [HttpGet]
+        public async Task<IActionResult> Applications(string? employerQ, string? seekerQ)
+        {
+            employerQ = employerQ?.Trim();
+            seekerQ = seekerQ?.Trim();
+
+            var appQuery = _context.JobApplications
+                .Include(a => a.Job)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(employerQ))
+            {
+                var employerIds = await _userManager.Users
+                    .Where(u =>
+                        (u.Email != null && u.Email.Contains(employerQ)) ||
+                        (u.UserName != null && u.UserName.Contains(employerQ)))
+                    .Select(u => u.Id)
+                    .ToListAsync();
+
+                appQuery = appQuery.Where(a => a.Job != null && employerIds.Contains(a.Job.EmployerId));
+            }
+
+            if (!string.IsNullOrEmpty(seekerQ))
+            {
+                var seekerIds = await _userManager.Users
+                    .Where(u =>
+                        (u.Email != null && u.Email.Contains(seekerQ)) ||
+                        (u.UserName != null && u.UserName.Contains(seekerQ)))
+                    .Select(u => u.Id)
+                    .ToListAsync();
+
+                appQuery = appQuery.Where(a => seekerIds.Contains(a.JobSeekerId));
+            }
+
+            var apps = await appQuery
+                .OrderByDescending(a => a.AppliedAt)
+                .ToListAsync();
+
+            ViewBag.EmployerQ = employerQ;
+            ViewBag.SeekerQ = seekerQ;
+
+            return View(apps);
+        }
+       
+        [HttpGet]
+        public async Task<IActionResult> ApplicationDetails(int id)
+        {
+            var application = await _context.JobApplications
+                .Include(a => a.Job)
+                .FirstOrDefaultAsync(a => a.Id == id);
+
+            if (application == null)
+                return NotFound();
+
+            return View(application);
+        }
+
     }
 }

@@ -31,6 +31,7 @@
     <title>@ViewData["Title"] - FPTJobMatch</title>
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body class="d-flex flex-column min-vh-100">
@@ -53,20 +54,32 @@
                             <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
 
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Jobs" asp-action="Index">Jobs</a>
+                        </li>
+
                         @if (SignInManager.IsSignedIn(User))
                         {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Jobs" asp-action="Index">Jobs</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Jobs" asp-action="Create">Post a Job</a>
-                            </li>
+                            @if (User.IsInRole("JobSeeker"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Jobs" asp-action="MyApplications">
+                                        My Applications
+                                    </a>
+                                </li>
+                            }
 
                             @if (User.IsInRole("Employer"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Jobs" asp-action="MyApplications">
-                                        Applications
+                                    <a class="nav-link" asp-controller="Jobs" asp-action="Create">
+                                        Post a Job
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Jobs" asp-action="ApplicationsForMyJobs">
+                                        Candidates
                                         @if (newAppsCount > 0)
                                         {
                                             <span class="badge bg-danger ms-1">@newAppsCount</span>
@@ -91,6 +104,11 @@
                                         <li>
                                             <a class="dropdown-item" asp-controller="Admin" asp-action="Jobs">
                                                 Manage jobs
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Admin" asp-action="Applications">
+                                                Manage applications (CV)
                                             </a>
                                         </li>
                                     </ul>
